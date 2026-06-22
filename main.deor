@@ -3,23 +3,21 @@ import "lib/convert.deor"
 
 fn void main()
 	print("Beginning simple ")
-	value as compute_with_leibniz(100)
+	value as compute_with_leibniz(100000000)
 	print(value)
 
 fn float compute_with_leibniz(int iterations)
 	float value = 0.0
 	for i in range(iterations)
 		is_even as i%2 is 0
-		rust
-			let decimal_i: f64 = i as f64;
-
-		float denom = 1.0 + decimal_i*2.0
+		decimal_i as c_int_to_float(i)
+		float denom = move 1.0 + decimal_i*2.0
 
 		if is_even
 			value = value + 1.0/denom
 		else
 			value = value - 1.0/denom
 
-	float result = 4.0 * value
-	return result
+	float result = move 4.0 * value
+	return move result
 
