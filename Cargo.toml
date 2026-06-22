@@ -1,0 +1,10 @@
+[package]
+name = "DeorPi"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "DeorPi"
+path = "build/main.rs"
+
+[dependencies]
