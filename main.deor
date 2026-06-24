@@ -1,4 +1,3 @@
-import "lib/math.deor"
 import "lib/convert.deor"
 import "lib/tasks.deor" where T = Chunk
 
@@ -7,16 +6,13 @@ struct Chunk
 	int max
 	float value
 
-
 fn Chunk make_chunk_calculation(Chunk chunk)
 	(min, max) in chunk
 	float value = 0.0
 	value as leibniz_iteration(min, max)
 
-	# put an error if type is missing on this side
-	Chunk chunk_with_value = move (min,max,value)
+	Chunk chunk_with_value = move (min, max, value)
 	return chunk_with_value
-
 
 fn void main()
 	print("Beginning simple ")
@@ -54,7 +50,6 @@ fn void main()
 
 	float pi_value = 4*net_value
 	print(pi_value)
-
 
 fn float leibniz_iteration(int start_iter, int end_iter)
 	float value = 0.0
