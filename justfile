@@ -7,3 +7,6 @@ build:
     mkdir -p build
     DEOR_LIB=lib deor main.deor build/main.rs
     cargo build
+
+update-deor-with-latest:
+    curl -sSf https://raw.githubusercontent.com/nathanphoffman/DeorLang/main/setup/update.sh | sh
