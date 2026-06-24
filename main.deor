@@ -38,6 +38,7 @@ fn void main()
 			min as current-chunk_count
 
 			PiChunk chunk = move (min, max, value)
+			list_of_chunks at end = move chunk    
 
 	piChunkList results = t_pi_chunk_run_all(pool, list_of_chunks, make_chunk_calculation)
 
@@ -45,6 +46,9 @@ fn void main()
 	for res in results
 		(min, max, value) in res
 		net_value = net_value + value
+
+	count as len(results)
+	print(count)
 
 	float pi_value = 4*net_value
 	print(pi_value)
