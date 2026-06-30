@@ -73,11 +73,10 @@ fn int ask_for_threads()
 		SmallPositive threads = c_string_to_int(first)	
 		
 		if threads is valid
-			return (avow threads)
+			return avow threads
 		else
 			print("Incorrect entry, must be >0 and the max is 16")
 
-	crash("Loop should not exit")
 
 fn int ask_for_iterations()
 	
@@ -88,11 +87,10 @@ fn int ask_for_iterations()
 		LargePositive iterations_per_thread = c_string_to_int(first)
 
 		if iterations_per_thread is valid
-			return (avow iterations_per_thread)
+			return avow iterations_per_thread
 		else
 			print("Incorrect entry, must be >0 and the max is 10 million - thousand")
 
-	crash("Loop should not exit")
 
 fn float total_final_results(piChunkList results)
 	float net_value = 0.0
@@ -101,6 +99,7 @@ fn float total_final_results(piChunkList results)
 		net_value = net_value + value
 	
 	return net_value
+
 
 fn void main()
 	
