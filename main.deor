@@ -6,44 +6,74 @@ struct PiChunk
 	int max
 	float value
 
-fn PiChunk make_chunk_calculation(PiChunk chunk)
+
+macro leibniz_iteration
+	is_even as (iter % 2 is 0)
+	decimal_iter as c_int_to_float(iter)
+	float denom = 1.0 + decimal_iter * 2.0
+
+	if is_even
+		value = value + 1.0 / denom
+	else
+		value = value - 1.0 / denom
+
+
+fn PiChunk compute_pi_chunk(PiChunk chunk)
 	(min, max) in chunk
 	float value = 0.0
 
-	# move is not required for min/a
-	value as leibniz_iteration(min, max)
-
+	value as perform_liebniz_computation(min, max)
 	PiChunk chunk_with_value = (min, max, value)
+
 	return chunk_with_value
+
+
+fn float perform_liebniz_computation(int start_iter, int end_iter)
+	float value = 0.0
+
+	# although quite unnecessary here, a macro can be helpful to divide up work
+	# with 0 concern of stack overflow and copying of values, they are best
+	# when used to break up heavily repeated code that is inside of loops
+	for iter in range(start_iter, end_iter)
+		macro_run leibniz_iteration
+
+	return move value
+
+
+fn piChunkList build_chunk(int max_iterations, int chunk_count)
+	piChunkList list_of_chunks = empty
+	float value = 0.0
+	current as 0
+
+	for if current < max_iterations
+		current = current + chunk_count
+
+		int max = current
+		if max > max_iterations
+			max = max_iterations
+
+		min as current - chunk_count
+		PiChunk chunk = (min, max, value)
+		list_of_chunks at end = move chunk
+	
+	return list_of_chunks
+
 
 fn void main()
 	print("Beginning simple ")
 
 	TaskPool pool = t_pool_make()
 
-	threads as 20
+	threads as 1
 	iteration_per_thread as 10_000_000
 	int max_iterations = iteration_per_thread * threads
 
-	current as 0
-	int chunk_count = move iteration_per_thread
-	prev_chunk as 0
-
-	piChunkList list_of_chunks = empty
+	int chunk_count = iteration_per_thread
 
 	# Put together the list_of_chunks to be processed
-	float value = 0.0
-	for if current < max_iterations
-		current = current + 1
-		if current % chunk_count is 0
-	
-			int max = current 
-			min as current - chunk_count
+	list_of_chunks as build_chunk(max_iterations, threads)
 
-			PiChunk chunk = (min, max, value)
-			list_of_chunks at end = move chunk    
-
-	piChunkList results = t_pi_chunk_run_all(pool, list_of_chunks, make_chunk_calculation)
+	piChunkList results = t_pi_chunk_run_all(pool, list_of_chunks, compute_pi_chunk)
 
 	float net_value = 0.0
 	for res in results
@@ -56,17 +86,4 @@ fn void main()
 	float pi_value = 4*net_value
 	print(pi_value)
 
-fn float leibniz_iteration(int start_iter, int end_iter)
-	float value = 0.0
-	for iter in range(start_iter, end_iter)
-		is_even as iter%2 is 0
-		decimal_i as c_int_to_float(iter)
-		float denom = 1.0 + decimal_i*2.0
-
-		if is_even
-			value = value + 1.0/denom
-		else
-			value = value - 1.0/denom
-
-	return move value
 
