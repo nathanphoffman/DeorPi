@@ -9,9 +9,11 @@ struct PiChunk
 fn PiChunk make_chunk_calculation(PiChunk chunk)
 	(min, max) in chunk
 	float value = 0.0
+
+	# move is not required for min/a
 	value as leibniz_iteration(min, max)
 
-	PiChunk chunk_with_value = move (min, max, value)
+	PiChunk chunk_with_value = (min, max, value)
 	return chunk_with_value
 
 fn void main()
@@ -20,7 +22,7 @@ fn void main()
 	TaskPool pool = t_pool_make()
 
 	threads as 20
-	iteration_per_thread as 100_000_000
+	iteration_per_thread as 10_000_000
 	int max_iterations = iteration_per_thread * threads
 
 	current as 0
@@ -29,15 +31,16 @@ fn void main()
 
 	piChunkList list_of_chunks = empty
 
+	# Put together the list_of_chunks to be processed
 	float value = 0.0
 	for if current < max_iterations
 		current = current + 1
 		if current % chunk_count is 0
 	
 			int max = current 
-			min as current-chunk_count
+			min as current - chunk_count
 
-			PiChunk chunk = move (min, max, value)
+			PiChunk chunk = (min, max, value)
 			list_of_chunks at end = move chunk    
 
 	piChunkList results = t_pi_chunk_run_all(pool, list_of_chunks, make_chunk_calculation)
