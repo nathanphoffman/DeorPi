@@ -1,21 +1,37 @@
 import "lib/convert.deor"
 import "lib/tasks.deor" where T = PiChunk
 
+# structs are data, no methods exist not can be attached no inheritance, 
+#  little abstraction, Deor is highly imperative and procedural
 struct PiChunk
 	int min
 	int max
 	float value
 
+# this shape is defined here but is actually redundant, the tasks 
+#  import above defines this shape for you as part of the T-substitution
+#  without the above import magic, we would need to define this ourselves
+#  this also leads to something else important: duplicate root definitions are
+#  imported on the first encounter, and then ignored, so this is actually legal:
+shape piChunkList = func of PiChunk to PiChunk
+
+# These are validator types that wrap Rust's Option, they return valid if 
+#  they are initialized with a value that matches, we will see more below
 type SmallPositive(int value)
 	value > 0 and value <= 16
 
 type LargePositive(int value)
 	value > 0 and value <= 1_000_000
 
+
+# Deor is very backwards looking to procedural code where macros were
+#  thrown around, while this isn't a great example, macros are great for 
+#  code reuse where functions called from loops might cause issues with the 
+#  stack or cause excessive cloning, via Deors default .clone() mapping onto Rust
 macro leibniz_iteration
 	is_even as (iter % 2 is 0)
 	decimal_iter as c_int_to_float(iter)
-	float denom = 1.0 + decimal_iter * 2.0
+	float denom = 1.0 + decimal_iter * 2
 
 	if is_even
 		value = value + 1.0 / denom
@@ -23,11 +39,18 @@ macro leibniz_iteration
 		value = value - 1.0 / denom
 
 
+# functions are C style in definition
 fn PiChunk compute_pi_chunk(PiChunk chunk)
+
+	# There is no dot notation in Deor, con/de(struction) is the only way
+	#  this keeps consistency with named variables
 	(min, max) in chunk
-	float value = 0.0
 
 	value as perform_liebniz_computation(min, max)
+
+	# This could have been done with an 'as', leaving off PiChunk
+	#  Rust underneath will figure out types but it is recommended
+	#  that for non-obvious type assumptions, you should spell it out
 	PiChunk chunk_with_value = (min, max, value)
 
 	return chunk_with_value
@@ -42,7 +65,7 @@ fn float perform_liebniz_computation(int start_iter, int end_iter)
 	for iter in range(start_iter, end_iter)
 		macro_run leibniz_iteration
 
-	return move value
+	return value
 
 
 fn piChunkList build_chunk(int max_iterations, int chunk_count)
