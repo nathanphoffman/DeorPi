@@ -8,13 +8,6 @@ struct PiChunk
 	int max
 	float value
 
-# this shape is defined here but is actually redundant, the tasks 
-#  import above defines this shape for you as part of the T-substitution
-#  without the above import magic, we would need to define this ourselves
-#  this also leads to something else important: duplicate root definitions are
-#  imported on the first encounter, and then ignored, so this is actually legal:
-shape piChunkList = func of PiChunk to PiChunk
-
 # These are validator types that wrap Rust's Option, they return valid if 
 #  they are initialized with a value that matches, we will see more below
 type SmallPositive(int value)
@@ -23,6 +16,12 @@ type SmallPositive(int value)
 type LargePositive(int value)
 	value > 0 and value <= 1_000_000
 
+# this shape is defined here but is actually redundant, the tasks 
+#  import above defines this shape for you as part of the T-substitution
+#  without the above import magic, we would need to define this ourselves
+#  this also leads to something else important: duplicate root definitions are
+#  imported on the first encounter, and then ignored, so this is actually legal:
+shape piChunkList = func of PiChunk to PiChunk
 
 # Deor is very backwards looking to procedural code where macros were
 #  thrown around, while this isn't a great example, macros are great for 
