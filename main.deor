@@ -3,6 +3,7 @@
 #  this follows the old C-methodology you must be careful about naming root level items
 import "lib/convert.deor"
 import "lib/string.deor"
+import "lib/math.deor"
 
 # This may look strange, it is a substitution for all T replaces with PiChunk, the main
 #  use of this is setting types for the import, a way of passing a generic
@@ -42,7 +43,7 @@ macro use_print_consts
 #  in for loops are not a bad option as many performance issues come from looping over function calls
 macro leibniz_iteration
 
-	# As will determine the type for you and initialize that variable at the same time
+	# As will allow the compiler to determine the type for you and initialize that variable in one go
 	is_even as (iter % 2 is 0)
 	decimal_iter as c_int_to_float(iter)
 	denom as 1.0 + decimal_iter * 2
@@ -58,12 +59,13 @@ fn PiChunk compute_pi_chunk(PiChunk chunk)
 
 	# There is no dot-notation in Deor, con/de(struction) is used to keep variable names consistent
 	(min, max) in chunk
-
-	value as perform_liebniz_computation(min, max)
-
+	)
 	# In addition to using as, you can also spell out types, this is recommended as a best practice
 	#  if the type of the value is not acutely obvious from what is being assigned to it
-	PiChunk chunk_with_value = (min, max, value)
+	float value = perform_liebniz_computation(min, max)
+
+	# Here we are using a 'with' this clones the struct and replaces the matching field
+	PiChunk chunk_with_value = chunk with (value)
 
 	return chunk_with_value
 
@@ -135,24 +137,24 @@ fn int ask_for_threads()
 
 fn int ask_for_iterations()
 	macro_run use_print_consts
-	const int DEFAULT = 1000
+	const int DEFAULT = 10
 
 	# Something not mentioned yet is that there is no `while`; Deor associates for and only-for with loop, so "for if" = while
 	for if true
-		prompt as "How many thousands of iterations per thread? (default 1000"
+		prompt as "How many millions of iterations do you want to run? (default 10 xMILLION"
 		print(prompt, SEPARATOR)
 
 		(first) in input()
 
-		LargePositive iterations_per_thread = c_string_to_int(first)
+		LargePositive iterations = c_string_to_int(first)
 
 
 		if first is NONE
 			return DEFAULT
-		else if iterations_per_thread is valid
-			return avow iterations_per_thread
+		else if iterations is valid
+			return avow iterations
 		else
-			print("Incorrect entry, must be >0 and the max is 10 million - thousand")
+			print("Incorrect entry, must be >0 and the max is 10 million x MILLION")
 
 
 fn float total_final_results(piChunkList results)
@@ -168,12 +170,16 @@ fn float total_final_results(piChunkList results)
 
 fn void main()
 	
-	const int THOUSANDS = 1000
+	# Deor supports _ separators for readability in numbers, they can be put anywhere and are dropped
+	const float MILLIONS = 1_000_000.0
 	const float LIEBNIZ_COEFFICIENT = 4
 
 	threads as ask_for_threads()
+	float_threads as c_int_to_float(threads)
 	iterations as ask_for_iterations()
-	iterations_per_thread as iterations * THOUSANDS
+	float_iterations as c_int_to_float(iterations) * MILLIONS
+
+	iterations_per_thread as m_floor(float_iterations/float_threads)
 
 	total_iterations as iterations_per_thread * threads
 	print("Performing " + c_int_to_string(total_iterations) + " iterations")
