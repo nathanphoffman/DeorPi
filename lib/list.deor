@@ -1,73 +1,49 @@
-shape lTList = list of T
+shape tList = list of T
 
-fn T l_T_first(lTList list)
+fn T l_T_first(tList items)
 	rust
-		list[0].clone()
+		items[0].clone()
 
-fn T l_T_last(lTList list)
+fn T l_T_last(tList items)
 	rust
-		list[list.len() - 1].clone()
+		items[items.len() - 1].clone()
 
-fn bool l_T_is_empty(lTList list)
+fn bool l_T_is_empty(tList items)
 	rust
-		list.is_empty()
+		items.is_empty()
 
-fn lTList l_T_reverse(lTList list)
+fn tList l_T_reverse(tList items)
 	rust
-		list.into_iter().rev().collect()
+		items.into_iter().rev().collect()
 
-fn lTList l_T_slice(lTList list, int start, int end)
+fn tList l_T_slice(tList items, int start, int stop)
 	rust
-		list[start as usize..end as usize].to_vec()
+		items[start as usize..stop as usize].to_vec()
 
-fn lTList l_T_concat(lTList a, lTList b)
+fn tList l_T_concat(tList left, tList right)
 	rust
-		{ let mut r = a; r.extend(b); r }
+		{ let mut r = left; r.extend(right); r }
 
-fn lTList l_T_sort(lTList list)
+fn bool l_T_contains(tList items, T item)
 	rust
-		{ let mut s = list; s.sort(); s }
+		items.contains(&item)
 
-fn T l_T_sum(lTList list)
+fn int l_T_index_of(tList items, T item)
 	rust
-		list.iter().copied().sum()
+		items.iter().position(|x| x == &item).map(|i| i as i64).unwrap_or(-1)
 
-fn T l_T_min(lTList list)
+fn tList l_T_take(tList items, int count)
 	rust
-		list.iter().cloned().min().unwrap_or_default()
+		items.into_iter().take(count as usize).collect()
 
-fn T l_T_max(lTList list)
+fn tList l_T_drop(tList items, int count)
 	rust
-		list.iter().cloned().max().unwrap_or_default()
+		items.into_iter().skip(count as usize).collect()
 
-fn string l_T_join(lTList list, string sep)
+fn tList l_T_push(tList items, T item)
 	rust
-		list.join(sep.as_str())
+		{ let mut r = items; r.push(item); r }
 
-fn bool l_T_contains(lTList list, T item)
+fn tList l_T_pop(tList items)
 	rust
-		list.contains(&item)
-
-fn int l_T_index_of(lTList list, T item)
-	rust
-		list.iter().position(|x| x == &item).map(|i| i as i32).unwrap_or(-1)
-
-fn lTList l_T_unique(lTList list)
-	rust
-		{ let mut seen = std::collections::HashSet::new(); list.into_iter().filter(|x| seen.insert(x.clone())).collect() }
-
-fn lTList l_T_take(lTList list, int n)
-	rust
-		list.into_iter().take(n as usize).collect()
-
-fn lTList l_T_drop(lTList list, int n)
-	rust
-		list.into_iter().skip(n as usize).collect()
-
-fn lTList l_T_push(lTList list, T item)
-	rust
-		{ let mut r = list; r.push(item); r }
-
-fn lTList l_T_pop(lTList list)
-	rust
-		{ let mut r = list; r.pop(); r }
+		{ let mut r = items; r.pop(); r }
