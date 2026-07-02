@@ -89,9 +89,6 @@ fn piChunkList build_chunk(int max_iterations, int iterations_per_thread)
 	float value = 0.0
 	current as 0
 
-	# Print can take a string or any other primitive, even a literal string if it is 1 argument
-	print("max_iterations is ")
-	print(max_iterations)
 	for if current < max_iterations
 		current = current + iterations_per_thread
 
@@ -132,6 +129,7 @@ fn int ask_for_threads()
 		else if input_value is valid
 			return avow input_value
 		else
+			# Print can take a string or any other primitive, even a literal string if it is 1 argument
 			print("Incorrect entry, must be >0 and the max is 16")
 
 
@@ -139,6 +137,7 @@ fn int ask_for_iterations()
 	macro_run use_print_consts
 	const int DEFAULT = 1000
 
+	# Something not mentioned yet is that there is no `while`; Deor associates for and only-for with loop, so "for if" = while
 	for if true
 		prompt as "How many thousands of iterations per thread? (default 1000"
 		print(prompt, SEPARATOR)
@@ -158,6 +157,8 @@ fn int ask_for_iterations()
 
 fn float total_final_results(piChunkList results)
 	float net_value = 0.0
+
+	# Here the for loop will iterate over every item in the list
 	for res in results
 		(min, max, value) in res
 		net_value = net_value + value
@@ -177,17 +178,15 @@ fn void main()
 	total_iterations as iterations_per_thread * threads
 	print("Performing " + c_int_to_string(total_iterations) + " iterations")
 	
-	# Multithreading operations
+	# Multithreading makes use of a task system, a wrapped rust library that exposes these features
+	#  It is very basic in use and requires a list of the substituted value (T-sub you saw earlier)
 	TaskPool pool = t_pool_make()
 	list_of_chunks as build_chunk(total_iterations, iterations_per_thread)
-
-	print("chunk number is")
-	print(len(list_of_chunks))
+	# When complete, it will output that same list-type as a result when all threads finish
 	piChunkList results = t_pi_chunk_run_all(pool, list_of_chunks, compute_pi_chunk)
 	
 	net_value as total_final_results(move results)
-
 	float pi_value = LIEBNIZ_COEFFICIENT * net_value
-	print(pi_value)
+	print(s_join(["Pi was calculated to be: ", c_float_to_string(pi_value)]))
 
 
