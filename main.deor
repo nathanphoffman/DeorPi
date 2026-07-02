@@ -59,7 +59,7 @@ fn PiChunk compute_pi_chunk(PiChunk chunk)
 
 	# There is no dot-notation in Deor, con/de(struction) is used to keep variable names consistent
 	(min, max) in chunk
-	)
+	
 	# In addition to using as, you can also spell out types, this is recommended as a best practice
 	#  if the type of the value is not acutely obvious from what is being assigned to it
 	float value = perform_liebniz_computation(min, max)
