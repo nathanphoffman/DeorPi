@@ -4,11 +4,9 @@
 import "lib/convert.deor"
 import "lib/string.deor"
 import "lib/math.deor"
-
 # This may look strange, it is a substitution for all T replaces with PiChunk, the main
 #  use of this is setting types for the import, a way of passing a generic
 import "lib/tasks.deor" where T = PiChunk
-
 
 # structs are data, no methods can be attached to the data; Deor is strongly procedural
 struct PiChunk
@@ -59,11 +57,9 @@ fn PiChunk compute_pi_chunk(PiChunk chunk)
 
 	# There is no dot-notation in Deor, con/de(struction) is used to keep variable names consistent
 	(min, max) in chunk
-	
 	# In addition to using as, you can also spell out types, this is recommended as a best practice
 	#  if the type of the value is not acutely obvious from what is being assigned to it
 	float value = perform_liebniz_computation(min, max)
-
 	# Here we are using a 'with' this clones the struct and replaces the matching field
 	PiChunk chunk_with_value = chunk with (value)
 
@@ -114,7 +110,6 @@ fn int ask_for_threads()
 		#  its "Human-Readability" philosophy enforces named-variables for functions with more than 1 argument
 		prompt as s_join(["How many thread-tasks would you like to run? (default ", c_int_to_string(DEFAULT)])
 		print(prompt, SEPARATOR)
-
 		# Inputs split on spacing to provide arguments, first is the first arg, and there is a second, and third.
 		#  There is also a input_string and input_list that gives you the full string and argument list if you need more
 		(first) in input()
@@ -143,11 +138,9 @@ fn int ask_for_iterations()
 	for if true
 		prompt as "How many millions of iterations do you want to run? (default 10 xMILLION"
 		print(prompt, SEPARATOR)
-
 		(first) in input()
 
 		LargePositive iterations = c_string_to_int(first)
-
 
 		if first is NONE
 			return DEFAULT
