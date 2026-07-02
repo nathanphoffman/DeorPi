@@ -1,5 +1,6 @@
 import "lib/convert.deor"
 import "lib/tasks.deor" where T = PiChunk
+import "lib/string.deor"
 
 # structs are data, no methods exist not can be attached no inheritance, 
 #  little abstraction, Deor is highly imperative and procedural
@@ -14,7 +15,7 @@ type SmallPositive(int value)
 	value > 0 and value <= 16
 
 type LargePositive(int value)
-	value > 0 and value <= 1_000_000
+	value > 0 and value <= 10_000_000
 
 # this shape is defined here but is actually redundant, the tasks 
 #  import above defines this shape for you as part of the T-substitution
@@ -22,6 +23,12 @@ type LargePositive(int value)
 #  this also leads to something else important: duplicate root definitions are
 #  imported on the first encounter, and then ignored, so this is actually legal:
 shape piChunkList = func of PiChunk to PiChunk
+
+
+macro use_print_consts
+	const string SEPARATOR = "): "
+	const string NONE = ""
+
 
 # Deor is very backwards looking to procedural code where macros were
 #  thrown around, while this isn't a great example, macros are great for 
@@ -67,19 +74,21 @@ fn float perform_liebniz_computation(int start_iter, int end_iter)
 	return value
 
 
-fn piChunkList build_chunk(int max_iterations, int chunk_count)
+fn piChunkList build_chunk(int max_iterations, int iterations_per_thread)
 	piChunkList list_of_chunks = empty
 	float value = 0.0
 	current as 0
 
+	print("max_iterations is ")
+	print(max_iterations)
 	for if current < max_iterations
-		current = current + chunk_count
+		current = current + iterations_per_thread
 
 		int max = current
 		if max > max_iterations
 			max = max_iterations
 
-		min as current - chunk_count
+		min as current - iterations_per_thread
 		PiChunk chunk = (min, max, value)
 		list_of_chunks at end = move chunk
 	
@@ -87,25 +96,32 @@ fn piChunkList build_chunk(int max_iterations, int chunk_count)
 
 
 fn int ask_for_threads()
-	
-	for if true
-		print("How many thread-tasks would you like to run? (default 8)")
-		(first) in input()
+	macro_run use_print_consts
+	const int DEFAULT = 8
 
-		SmallPositive threads = c_string_to_int(first)	
-		
-		if threads is valid
-			return avow threads
+	for if true
+		prompt as s_join(["How many thread-tasks would you like to run? (default ", c_int_to_string(DEFAULT)])
+		print(prompt, SEPARATOR)
+		(first) in input()
+		SmallPositive input_value = c_string_to_int(first)
+
+		if first is NONE
+			return DEFAULT
+		else if input_value is valid
+			return avow input_value
 		else
 			print("Incorrect entry, must be >0 and the max is 16")
 
 
 fn int ask_for_iterations()
-	
+	macro_run use_print_consts
+	const int DEFAULT = 1000
+
 	for if true
-		print("How many thousands of iterations per thread? (default 1000): ")
+		prompt as "How many thousands of iterations per thread? (default 1000"
+		print(prompt, SEPARATOR)
+
 		(first) in input()
-		
 		LargePositive iterations_per_thread = c_string_to_int(first)
 
 		if iterations_per_thread is valid
@@ -137,7 +153,10 @@ fn void main()
 	
 	# Multithreading operations
 	TaskPool pool = t_pool_make()
-	list_of_chunks as build_chunk(total_iterations, threads)
+	list_of_chunks as build_chunk(total_iterations, iterations_per_thread)
+
+	print("chunk number is")
+	print(len(list_of_chunks))
 	piChunkList results = t_pi_chunk_run_all(pool, list_of_chunks, compute_pi_chunk)
 	
 	net_value as total_final_results(move results)
