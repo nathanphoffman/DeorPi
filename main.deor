@@ -157,6 +157,9 @@ fn int ask_for_iterations()
 			print("Incorrect entry, must be >0 and the max is 10 million x MILLION")
 
 
+# Deor is very picky about case as it is key to human readability, as you have seen already consts are SCREAMING_SNAKE
+#  primitives are one word lowercase, shapes are camelCase, structs PascalCase, functions/variables snake_case, and enums are
+#  PascalCase, the idea being camel/Pascal is user defined structure with camel being generic, and snake is user defined behavior
 fn float total_final_results(piChunkList results)
 	float net_value = 0.0
 
