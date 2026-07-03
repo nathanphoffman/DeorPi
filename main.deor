@@ -17,10 +17,10 @@ struct PiChunk
 # These are validator types that wrap Rust's Option, they return valid (or not valid) if they are 
 #  set to a value that matches the predicate, this is the only way to have a "null/undefined" in Deor
 type SmallPositive(int value)
-	value > 0 and value <= 16
+	value > 0 and value <= 32
 
 type LargePositive(int value)
-	value > 0 and value <= 10_000_000
+	value > 0 and value <= 100_000
 
 # Shapes are the equivalent to generics in other languages, Deor believes in strong human
 #  readability so we use shapes (not <>) for lists and generic function definitions. piChunkList
@@ -106,37 +106,37 @@ fn int ask_for_threads()
 	const int DEFAULT = 8
 
 	for if true
-		# You will notice that prompt is not passed in literally to print, the reason why is Deor as part of 
-		#  its "Human-Readability" philosophy enforces named-variables for functions with more than 1 argument
+		# You will notice that prompt is not passed literally, the reason why is Deor as part of the
+		#  "Human-Readability" philosophy: use named-variables for functions with more than 1 argument
 		prompt as s_join(["How many thread-tasks would you like to run? (default ", c_int_to_string(DEFAULT)])
 		print(prompt, SEPARATOR)
-		# Inputs split on spacing to provide arguments, first is the first arg, and there is a second, and third.
-		#  There is also a input_string and input_list that gives you the full string and argument list if you need more
+		# Inputs split on spacing to provide arguments, first is the first arg, second the second and so on.
+		#  There is also a input_string and input_list that gives the full string and argument list.
 		(first) in input()
 
-		# There are libs included with Deor that wrap rust blocks allowing raw access to rust features, these 
-		#  libs are always prefixed with a letter, here it is the convert lib c_ to not pollute the global space
+		# Libs are included with Deor that wrap rust blocks allowing raw access to rust features, these 
+		#  libs are prefixed with a letter, here it is the convert lib c_ to not pollute the global space
+		# When assigned SmallPositive is validated against its predicate you saw earlier
 		SmallPositive input_value = c_string_to_int(first)
 
 		if first is NONE
 			return DEFAULT
-		# Above validator types were mentioned, when assigned SmallPositive is validated against its predicate you saw earlier
-		#  Here the is valid checks it follows that predicate; if it does an 'avow' unwraps the primitive, since we checked
-		#  we 'avow' the value, if we are wrong it will crash -- hence the strong wording 'avow'.
+		#  Here the is valid checks that SmallPositive predicate; an 'avow' unwraps the primitive if valid
+		#  If we are wrong with avow it will crash -- hence the strong wording 'avow'.
 		else if input_value is valid
 			return avow input_value
 		else
 			# Print can take a string or any other primitive, even a literal string if it is 1 argument
-			print("Incorrect entry, must be >0 and the max is 16")
+			print("Incorrect entry, must be >0 and the max is 32")
 
 
 fn int ask_for_iterations()
 	macro_run use_print_consts
 	const int DEFAULT = 10
 
-	# Something not mentioned yet is that there is no `while`; Deor associates for and only-for with loop, so "for if" = while
+	# Something not mentioned yet is that there is no `while`; for = loop, so "for if" = while
 	for if true
-		prompt as "How many millions of iterations do you want to run? (default 10 xMILLION"
+		prompt as "How many MILLIONS of iterations do you want to run? (default 10 xMILLION"
 		print(prompt, SEPARATOR)
 		(first) in input()
 
@@ -147,12 +147,12 @@ fn int ask_for_iterations()
 		else if iterations is valid
 			return avow iterations
 		else
-			print("Incorrect entry, must be >0 and the max is 10 million x MILLION")
+			print("Incorrect entry, must be >0 and the max is 100000 (in MILLIONS)")
 
 
-# Deor is very picky about case as it is key to human readability, as you have seen already consts are SCREAMING_SNAKE
-#  primitives are one word lowercase, shapes are camelCase, structs PascalCase, functions/variables snake_case, and enums are
-#  PascalCase, the idea being camel/Pascal is user defined structure with camel being generic, and snake is user defined behavior
+# Deor is picky about case as it is key to readability: consts are SCREAMING_SNAKE, primitives are one  
+#  word lowercase, shapes are camelCase, structs and enums PascalCase, functions/variables snake_case. 
+# The idea is logic uses snake_case and structure uses Pascal or camelCase.
 fn float total_final_results(piChunkList results)
 	float net_value = 0.0
 
