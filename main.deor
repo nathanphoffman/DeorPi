@@ -31,7 +31,7 @@ shape piChunkList = func of PiChunk to PiChunk
 
 # Macros are ways you can insert code (as seen below with macro_run) as part of the transpiler,
 #  it is as if you had written it that way. Consts can't be global, so this is a useful pattern.
-macro use_print_consts
+unsafe_macro use_print_consts
 	const string SEPARATOR = "): "
 	const string NONE = ""
 
@@ -102,7 +102,7 @@ fn piChunkList build_chunk(int max_iterations, int iterations_per_thread)
 
 
 fn int ask_for_threads()
-	macro_run use_print_consts
+	unsafe_macro_run use_print_consts
 	const int DEFAULT = 8
 
 	for if true
@@ -131,7 +131,7 @@ fn int ask_for_threads()
 
 
 fn int ask_for_iterations()
-	macro_run use_print_consts
+	unsafe_macro_run use_print_consts
 	const int DEFAULT = 10
 
 	# Something not mentioned yet is that there is no `while`; for = loop, so "for if" = while
@@ -178,7 +178,8 @@ fn void main()
 	iterations_per_thread as m_floor(float_iterations/float_threads)
 
 	total_iterations as iterations_per_thread * threads
-	print("Performing " + c_int_to_string(total_iterations) + " iterations")
+	message as s_join(["Performing ", c_int_to_string(total_iterations), " iterations"])
+	print(message)
 	
 	# Multithreading makes use of a task system, a wrapped rust library that exposes these features
 	#  It is very basic in use and requires a list of the substituted value (T-sub you saw earlier)
