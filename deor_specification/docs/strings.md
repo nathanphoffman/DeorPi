@@ -38,6 +38,8 @@ let quote = "She said \"hello\"".to_string();
 
 No other escape sequences are supported in v1. For Unicode escapes or raw byte strings, use a `rust` block.
 
+An unrecognized escape (`\r`, `\x41`, etc.) isn't a transpiler error — the lexer silently passes it through as a literal backslash followed by the character, rather than rejecting it. `"bad\rescape"` becomes the literal 12-character text `bad\rescape` (backslash included), not a carriage return. Stick to the four sequences above; anything else quietly means something other than what it looks like.
+
 ---
 
 ## Concatenation
@@ -140,3 +142,7 @@ bool is_pdf = s_ends_with(filename, ext)
 | `s_char_at(str, idx)` | `str.chars().nth(idx as usize).map(\|c\| c.to_string()).unwrap_or_default()` |
 | `s_substring(str, start, end)` | `str.chars().skip(start).take(end - start).collect()` |
 | `s_repeat(str, count)` | `str.repeat(count as usize)` |
+| `s_chars(str)` | `str.chars().map(\|c\| c.to_string()).collect()` |
+| `s_pad_left(str, width)` | `format!("{:>width$}", str, width = width as usize)` |
+| `s_pad_right(str, width)` | `format!("{:<width$}", str, width = width as usize)` |
+| `s_split_whitespace(str)` | `str.split_whitespace().map(\|s\| s.to_string()).collect()` |
