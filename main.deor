@@ -4,6 +4,7 @@
 import "lib/convert.deor"
 import "lib/string.deor"
 import "lib/math.deor"
+
 # This may look strange, it is a substitution for all T replaces with PiChunk, the main
 #  use of this is setting types for the import, a way of passing a generic
 import "lib/tasks.deor" where T = PiChunk
@@ -28,13 +29,11 @@ type LargePositive(int value)
 #  which brings us to another important point: Deor will simply drop root level items that are clones
 shape piChunkList = func of PiChunk to PiChunk
 
-
 # Macros are ways you can insert code (as seen below with macro_run) as part of the transpiler,
 #  it is as if you had written it that way. Consts can't be global, so this is a useful pattern.
 unsafe_macro use_print_consts
 	const string SEPARATOR = "): "
 	const string NONE = ""
-
 
 # Because Deor clones all items by default, iteration in loops clones arguments to functions
 #  (which is a problem for a list or large struct), while not true here, macros for organization 
@@ -51,20 +50,20 @@ macro leibniz_iteration
 	else
 		value = value - 1.0 / denom
 
-
 # Functions and variables are C style in definition {type} {name}
 fn PiChunk compute_pi_chunk(PiChunk chunk)
 
 	# There is no dot-notation in Deor, con/de(struction) is used to keep variable names consistent
 	(min, max) in chunk
+
 	# In addition to using as, you can also spell out types, this is recommended as a best practice
 	#  if the type of the value is not acutely obvious from what is being assigned to it
 	float value = perform_liebniz_computation(min, max)
+
 	# Here we are using a 'with' this clones the struct and replaces the matching field
 	PiChunk chunk_with_value = chunk with (value)
 
 	return chunk_with_value
-
 
 fn float perform_liebniz_computation(int start_iter, int end_iter)
 	float value = 0.0
@@ -75,7 +74,6 @@ fn float perform_liebniz_computation(int start_iter, int end_iter)
 		macro_run leibniz_iteration
 
 	return value
-
 
 # Although still well under the limit, functions have a strict limit of three parameters, if passing
 #  more, you must use a struct. Again: the focus here is human readability
@@ -91,6 +89,7 @@ fn piChunkList build_chunk(int max_iterations, int iterations_per_thread)
 		current = current + iterations_per_thread
 
 		int max = current
+
 		if max > max_iterations
 			max = max_iterations
 
@@ -99,7 +98,6 @@ fn piChunkList build_chunk(int max_iterations, int iterations_per_thread)
 		list_of_chunks at end = move chunk
 	
 	return list_of_chunks
-
 
 fn int ask_for_threads()
 	unsafe_macro_run use_print_consts
@@ -110,6 +108,7 @@ fn int ask_for_threads()
 		#  "Human-Readability" philosophy: use named-variables for functions with more than 1 argument
 		prompt as s_join(["How many thread-tasks would you like to run? (default ", c_int_to_string(DEFAULT)])
 		print(prompt, SEPARATOR)
+
 		# Inputs split on spacing to provide arguments, first is the first arg, second the second and so on.
 		#  There is also a input_string and input_list that gives the full string and argument list.
 		(first) in input()
@@ -121,6 +120,7 @@ fn int ask_for_threads()
 
 		if first is NONE
 			return DEFAULT
+
 		#  Here the is valid checks that SmallPositive predicate; an 'avow' unwraps the primitive if valid
 		#  If we are wrong with avow it will crash -- hence the strong wording 'avow'.
 		else if input_value is valid
@@ -128,7 +128,6 @@ fn int ask_for_threads()
 		else
 			# Print can take a string or any other primitive, even a literal string if it is 1 argument
 			print("Incorrect entry, must be >0 and the max is 32")
-
 
 fn int ask_for_iterations()
 	unsafe_macro_run use_print_consts
@@ -149,7 +148,6 @@ fn int ask_for_iterations()
 		else
 			print("Incorrect entry, must be >0 and the max is 100000 (in MILLIONS)")
 
-
 # Deor is picky about case as it is key to readability: consts are SCREAMING_SNAKE, primitives are one  
 #  word lowercase, shapes are camelCase, structs and enums PascalCase, functions/variables snake_case. 
 # The idea is logic uses snake_case and structure uses Pascal or camelCase.
@@ -162,7 +160,6 @@ fn float total_final_results(piChunkList results)
 		net_value = net_value + value
 	
 	return net_value
-
 
 fn void main()
 	
@@ -185,6 +182,7 @@ fn void main()
 	#  It is very basic in use and requires a list of the substituted value (T-sub you saw earlier)
 	TaskPool pool = t_pool_make()
 	list_of_chunks as build_chunk(total_iterations, iterations_per_thread)
+
 	# When complete, it will output that same list-type as a result when all threads finish
 	piChunkList results = t_pi_chunk_run_all(pool, list_of_chunks, compute_pi_chunk)
 	
