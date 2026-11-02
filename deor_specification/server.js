@@ -27,6 +27,7 @@ function fileType(path) {
   try {
     const stat = statSync(path);
 
+    // check file first, then directory; anything else (socket, device) counts as neither
     return stat.isFile() ? "file" : stat.isDirectory() ? "dir" : null;
   } catch {
     return null;

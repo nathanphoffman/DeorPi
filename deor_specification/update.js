@@ -8,6 +8,7 @@ const BASE = "https://raw.githubusercontent.com/nathanphoffman/NewWeb/main/setup
 // runtime files only — never touches .md content, README.txt, or the user's package.json
 const FILES = [
   { url: `${BASE}/index.html`, dest: join(dir, "index.html") },
+  // the wasm engine is nested deeper than the other files, so its path has several segments
   { url: `${BASE}/engine/build/pkg/engine_bg.wasm`, dest: join(dir, "engine", "build", "pkg", "engine_bg.wasm") },
   { url: `${BASE}/server.js`, dest: join(dir, "server.js") },
   { url: `${BASE}/update.js`, dest: join(dir, "update.js") },
